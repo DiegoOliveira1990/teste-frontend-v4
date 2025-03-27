@@ -196,73 +196,82 @@ function App() {
         </div>
       </div>
 
-      <div className="map-container">
-        <MapContainer center={mapCenter} zoom={13} style={{ height: '600px', width: '100%' }}>
-          <TileLayer
-            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-          />
-          
-          {filteredEquipments.map(equipment => (
-            equipment.lastPosition ? (
-                <Marker
-                key={equipment.id}
-                position={[equipment.lastPosition.lat, equipment.lastPosition.lon]}
-                icon={createCustomMarker(equipment)}
-                eventHandlers={{
-                  click: () => handleEquipmentSelect(equipment),
-                  mouseover: (e) => {
-                    e.target.openPopup();
-                  },
-                  mouseout: (e) => {
-                    // Opcional: se quiser que o popup feche quando o mouse sair
-                    // e.target.closePopup();
-                  }
-                }}
-              >
-                <Tooltip>{equipment.name}</Tooltip>
-                <Popup>
-                  <div>
-                    <h3>{equipment.name}</h3>
-                    <p>Modelo: {equipment.model}</p>
-                    <p>Estado: 
-                      <span 
-                        style={{ 
-                          color: equipment.currentState?.color || '#000', 
-                          fontWeight: 'bold',
-                          marginLeft: '5px'
-                        }}
-                      >
-                        {equipment.currentState?.name || 'Desconhecido'}
-                      </span>
-                    </p>
-                    <button onClick={() => handleEquipmentSelect(equipment)}>
-                      Ver Histórico
-                    </button>
-                  </div>
-                </Popup>
-              </Marker>
-            ) : null
-          ))}
-          
-          {/* Mostrar trajeto se ativado */}
-          {showPath && selectedEquipmentPath.length > 0 && (
-            <Polyline
-              positions={selectedEquipmentPath.map(pos => [pos.lat, pos.lon])}
-              color="blue"
-              weight={3}
-              opacity={0.7}
+      <div className="content-container">
+        <div className="map-container">
+          <MapContainer center={mapCenter} zoom={13} style={{ height: '100%', width: '100%' }}>
+            <TileLayer
+              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
             />
-          )}
-        </MapContainer>
-      </div>
+            
+            {filteredEquipments.map(equipment => (
+              equipment.lastPosition ? (
+                <Marker
+                  key={equipment.id}
+                  position={[equipment.lastPosition.lat, equipment.lastPosition.lon]}
+                  icon={createCustomMarker(equipment)}
+                  eventHandlers={{
+                    click: () => handleEquipmentSelect(equipment),
+                    mouseover: (e) => {
+                      e.target.openPopup();
+                    },
+                    mouseout: (e) => {
+                      // Comentado para manter o popup aberto até clicar fora
+                      // e.target.closePopup();
+                    }
+                  }}
+                >
+                  <Tooltip>{equipment.name}</Tooltip>
+                  <Popup>
+                    <div>
+                      <h3>{equipment.name}</h3>
+                      <p>Modelo: {equipment.model}</p>
+                      <p>Estado: 
+                        <span 
+                          style={{ 
+                            color: equipment.currentState?.color || '#000', 
+                            fontWeight: 'bold',
+                            marginLeft: '5px'
+                          }}
+                        >
+                          {equipment.currentState?.name || 'Desconhecido'}
+                        </span>
+                      </p>
+                      <button onClick={() => handleEquipmentSelect(equipment)}>
+                        Ver Histórico
+                      </button>
+                    </div>
+                  </Popup>
+                </Marker>
+              ) : null
+            ))}
+            
+            {/* Mostrar trajeto se ativado */}
+            {showPath && selectedEquipmentPath.length > 0 && (
+              <Polyline
+                positions={selectedEquipmentPath.map(pos => [pos.lat, pos.lon])}
+                color="blue"
+                weight={3}
+                opacity={0.7}
+              />
+            )}
+          </MapContainer>
+        </div>
 
-      {selectedEquipment && (
-        <EquipmentStatistics 
-          equipment={selectedEquipment}
-          stats={calculateStats(selectedEquipment)}
-        />
-      )}
+        <div className="stats-sidebar">
+          {selectedEquipment ? (
+            <EquipmentStatistics 
+              equipment={selectedEquipment}
+              stats={calculateStats(selectedEquipment)}
+            />
+          ) : (
+            <div className="no-equipment-selected">
+              <h3>Estatísticas</h3>
+              <p>Selecione um equipamento no mapa para ver suas estatísticas detalhadas.</p>
+            </div>
+          )}
+        </div>
+      </div>
 
       {showModal && selectedEquipment && (
         <StateHistoryModal 
