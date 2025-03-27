@@ -205,17 +205,22 @@ function App() {
           
           {filteredEquipments.map(equipment => (
             equipment.lastPosition ? (
-              <Marker
+                <Marker
                 key={equipment.id}
                 position={[equipment.lastPosition.lat, equipment.lastPosition.lon]}
                 icon={createCustomMarker(equipment)}
                 eventHandlers={{
-                  click: () => handleEquipmentSelect(equipment)
+                  click: () => handleEquipmentSelect(equipment),
+                  mouseover: (e) => {
+                    e.target.openPopup();
+                  },
+                  mouseout: (e) => {
+                    // Opcional: se quiser que o popup feche quando o mouse sair
+                    // e.target.closePopup();
+                  }
                 }}
               >
-                <Tooltip permanent={true}>
-                  {equipment.name}
-                </Tooltip>
+                <Tooltip>{equipment.name}</Tooltip>
                 <Popup>
                   <div>
                     <h3>{equipment.name}</h3>
